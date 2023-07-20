@@ -1,4 +1,5 @@
 import os
+from fastapi import HTTPException
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from jose import jwt
@@ -14,6 +15,13 @@ async def generateToken(payload: dict, expires: timedelta):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
 
-    encode_payload.update({"exp": expire})
     encoded_jwt = jwt.encode(encode_payload, secret, algorithm="HS256")
     return encoded_jwt
+
+def verifyToken(token: str):
+    try:
+        payload = jwt.decode(token, secret, algorithms=["HS256"])
+    except:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    return payload

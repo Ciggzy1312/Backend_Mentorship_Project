@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from datetime import datetime, timedelta
 from bson import ObjectId
@@ -13,12 +13,10 @@ router = APIRouter(prefix="/auth")
 # Register User -> POST /api/auth/register
 @router.post("/register")
 async def register(payload: UserCreate):
-    print(payload)
     if(payload.name == "" or payload.email == "" or payload.password == ""):
         return JSONResponse(status_code=400, content={"message": "Please fill all the fields"})
 
     userExists = await User.find_one({"email": payload.email})
-    print(userExists)
     if userExists:
         return JSONResponse(status_code=400, content={"message": "User with this email already exists"})
 
