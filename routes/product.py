@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from bson import ObjectId
+
 from database.database import Product
-from models.product import ProductCreate
-
+from models.product import ProductCreate, ProductUpdate
 from dependency import get_current_user
-from serializers.product import products_serializer
-
+from serializers.product import products_serializer, product_serializer
+from utils import validator
 
 router = APIRouter(prefix="/product")
 
@@ -34,3 +35,30 @@ async def get_all_products():
         return JSONResponse(status_code=200, content={"products": products_serializer(products)})
 
     return JSONResponse(status_code=400, content={"error": "Products could not be fetched"})
+
+
+# Get Product By Id -> GET /api/product/{id}
+@router.get("/{id}")
+async def get_product_by_id(id: str, user: dict = Depends(get_current_user)):
+    product = await Product.find_one({"_id": ObjectId(id)})
+
+    if product:
+        return JSONResponse(status_code=200, content={"product": product_serializer(product)})
+
+    return JSONResponse(status_code=400, content={"error": "Product could not be fetched"})
+
+
+# Update Product By Id -> PUT /api/product/{id}
+@router.put("/{id}")
+async def update_product_by_id(id: str, product: ProductUpdate, user: dict = Depends(get_current_user)):
+    
+    productExists = await Product.find_one({"_id": ObjectId(id)})
+    if not productExists:
+        return JSONResponse(status_code=400, content={"error": "Product does not exist"})
+
+    productUpdated = await Product.update_one({"_id": ObjectId(id)}, {"$set": validator.remove_none_values(product.dict())})
+
+    if productUpdated:
+        return JSONResponse(status_code=200, content={"message": "Product updated successfully"})
+
+    return JSONResponse(status_code=400, content={"error": "Product could not be updated"})

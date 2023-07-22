@@ -8,3 +8,9 @@ class ProductBase(BaseModel):
 
 class ProductCreate(ProductBase):
     created_by: str | None = None
+
+class ProductUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    price: float | None = None
+    quantity: int | None = None
