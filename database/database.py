@@ -12,3 +12,4 @@ except Exception:
 
 db = client.Mentorship_Project
 User = db.user
+Product = db.product
