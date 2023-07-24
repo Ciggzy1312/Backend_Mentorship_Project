@@ -15,6 +15,7 @@ async def generateToken(payload: dict, expires: timedelta):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
 
+    encode_payload['exp'] = expire
     encoded_jwt = jwt.encode(encode_payload, secret, algorithm="HS256")
     return encoded_jwt
 

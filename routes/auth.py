@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from bson import ObjectId
 
 from models.user import UserCreate, UserLogin
-from database.database import User
+from database.database import User, Basket
 from utils import password, token
 from serializers import user
 
@@ -23,6 +23,10 @@ async def register(payload: UserCreate):
     payload.password = password.hashPassword(payload.password)
 
     userInserted = await User.insert_one(payload.dict())
+
+    #Create empty basket for user while registration
+    basket = {'userId':str(userInserted.inserted_id),'products':[]}
+    await Basket.insert_one(basket)
 
     return JSONResponse(status_code=200, content={"message": "User registered successfully", "userId": str(userInserted.inserted_id)})
 
