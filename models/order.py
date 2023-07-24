@@ -3,3 +3,4 @@ from bson import ObjectId
 
 class OrderBase(BaseModel):
     basketId: str
+    userId: str
