@@ -9,4 +9,7 @@ class BasketBase(BaseModel):
     userId: str | None = None
     products: list[BasketProductInfo] | None = None
 
+class BasketUpdate(BaseModel):
+    products: list[BasketProductInfo] | None = None
+
 
